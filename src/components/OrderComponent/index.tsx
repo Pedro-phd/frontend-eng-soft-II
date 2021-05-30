@@ -23,7 +23,7 @@ function OrderComponent() {
       console.log(height, width, weight, length, uf)
       const value = await axios.get(
         // `https://pegasus-logistics-backend.herokuapp.com/package?height=${height}&width=${width}&weight=${weight}&length=${length}&state=${uf}`
-        'http://pegasus-logistics-backend.herokuapp.com/package?height=50&width=50&weight=2&length=50&state=SP',
+        'https://pegasus-logistics-backend.herokuapp.com/package?height=50&width=50&weight=2&length=50&state=SP',
         { headers }
       )
       console.log(value)
