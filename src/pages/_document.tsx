@@ -5,8 +5,8 @@ import Document, {
   NextScript,
   DocumentContext
 } from 'next/document'
-import { ServerStyleSheet } from 'styled-components'
-
+import { ServerStyleSheet, ThemeProvider } from 'styled-components'
+import { theme } from '../styles/theme'
 export default class MyDocument extends Document {
   static async getInitialProps(ctx: DocumentContext) {
     const sheet = new ServerStyleSheet()
@@ -36,13 +36,15 @@ export default class MyDocument extends Document {
 
   render() {
     return (
-      <Html lang="pt-BR">
-        <Head />
-        <body>
-          <Main />
-          <NextScript />
-        </body>
-      </Html>
+      <ThemeProvider theme={theme}>
+        <Html lang="pt-BR">
+          <Head />
+          <body>
+            <Main />
+            <NextScript />
+          </body>
+        </Html>
+      </ThemeProvider>
     )
   }
 }
