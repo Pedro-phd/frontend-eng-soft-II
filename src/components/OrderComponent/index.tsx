@@ -7,10 +7,12 @@ import {
   Title,
   FormContainer,
   BtnCadastrar,
-  Form
+  Form,
+  LoadingScreen
 } from './styles'
 import { GET_ORDER, CAD_ORDER } from '../../graphql/queries'
 import ModalComponent from '../Modal/index'
+import { BoxLoading } from 'react-loadingg'
 
 function OrderComponent() {
   const [open, setOpen] = useState(false)
@@ -23,12 +25,14 @@ function OrderComponent() {
   const [cep, setCep] = useState('')
   const [freteValue, setFreteValue] = useState(0)
 
+  const [loading, setLoading] = useState(false)
+
   const [modalTitle, setModalTitle] = useState('')
   const [modalDesc, setModalDesc] = useState('Por favor contate nosso suporte!')
   const [modalCode, setModalCode] = useState('')
   const [modalSucess, setModalSucess] = useState(true)
 
-  const [createOrder, responseCreateOrder] = useMutation(CAD_ORDER)
+  const [createOrder, responseCreateOrderTest] = useMutation(CAD_ORDER)
 
   const headers = {
     'Content-Type': 'application/json; charset=utf-8',
@@ -38,6 +42,7 @@ function OrderComponent() {
   const handleClick = async (e) => {
     e.preventDefault()
     try {
+      setLoading(true)
       const responseUF = await axios.get(
         `https://viacep.com.br/ws/${cep}/json/`
       )
@@ -48,6 +53,7 @@ function OrderComponent() {
         { headers }
       )
       await setFreteValue(value.data.price)
+      console.log(responseCreateOrderTest)
       const responseCreateOrder = await createOrder({
         variables: {
           cepDestinatio: cep,
@@ -60,7 +66,6 @@ function OrderComponent() {
           width: width
         }
       })
-
       setModalTitle('Sucesso! Veja abaixo o código do seu pedido.')
       setModalDesc(
         `Preço Final: R$${value.data.price.toFixed(2)} - Destino: ${cep}`
@@ -69,17 +74,24 @@ function OrderComponent() {
         responseCreateOrder.data.insert_pegasus_order.returning[0].orderCode
       )
       setModalSucess(true)
+      setLoading(false)
       setOpen(true)
     } catch (error) {
       setModalTitle('Não foi possivel realizar a ação.')
       setModalCode('Por favor contate nosso suporte!')
       setModalSucess(false)
+      setLoading(false)
       setOpen(true)
     }
   }
 
   return (
     <Container>
+      {loading ? (
+        <LoadingScreen>
+          <BoxLoading color="#34315E" />
+        </LoadingScreen>
+      ) : null}
       <Form>
         <FormContainer>
           <Title>PACOTE</Title>
