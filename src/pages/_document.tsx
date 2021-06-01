@@ -7,6 +7,7 @@ import Document, {
 } from 'next/document'
 import { ServerStyleSheet, ThemeProvider } from 'styled-components'
 import { theme } from '../styles/theme'
+
 export default class MyDocument extends Document {
   static async getInitialProps(ctx: DocumentContext) {
     const sheet = new ServerStyleSheet()

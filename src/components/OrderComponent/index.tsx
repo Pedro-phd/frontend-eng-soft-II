@@ -1,72 +1,139 @@
 import axios from 'axios'
 import { ReactNode, useState } from 'react'
-
-import { Container, Input, Title, FormContainer, BtnCadastrar } from './styles'
+import { useLazyQuery, useMutation } from '@apollo/client'
+import {
+  Container,
+  Input,
+  Title,
+  FormContainer,
+  BtnCadastrar,
+  Form
+} from './styles'
+import { GET_ORDER, CAD_ORDER } from '../../graphql/queries'
+import ModalComponent from '../Modal/index'
 
 function OrderComponent() {
-  const [width, setWidth] = useState('')
-  const [height, setHeight] = useState('')
-  const [length, setLength] = useState('')
-  const [weight, setWeight] = useState('')
+  const [open, setOpen] = useState(false)
+  const [width, setWidth] = useState(0)
+  const [height, setHeight] = useState(0)
+  const [length, setLength] = useState(0)
+  const [weight, setWeight] = useState(0)
   const [cpfDestinatario, setCpfDestinatario] = useState('')
   const [cpfRemetente, setCpfRemetente] = useState('')
   const [cep, setCep] = useState('')
+  const [freteValue, setFreteValue] = useState(0)
+
+  const [modalTitle, setModalTitle] = useState('')
+  const [modalDesc, setModalDesc] = useState('Por favor contate nosso suporte!')
+  const [modalCode, setModalCode] = useState('')
+  const [modalSucess, setModalSucess] = useState(true)
+
+  const [createOrder, responseCreateOrder] = useMutation(CAD_ORDER)
 
   const headers = {
-    'Content-Type': 'application/json; charset=utf-8'
+    'Content-Type': 'application/json; charset=utf-8',
+    'Access-Control-Allow-Origin': 'http://localhost:3000'
   }
 
-  const handleClick = async () => {
+  const handleClick = async (e) => {
+    e.preventDefault()
     try {
-      const response = await axios.get(`https://viacep.com.br/ws/${cep}/json/`)
-      const uf = response.data.uf
+      const responseUF = await axios.get(
+        `https://viacep.com.br/ws/${cep}/json/`
+      )
+      const uf = responseUF.data.uf
       console.log(height, width, weight, length, uf)
       const value = await axios.get(
-        // `https://pegasus-logistics-backend.herokuapp.com/package?height=${height}&width=${width}&weight=${weight}&length=${length}&state=${uf}`
-        'https://pegasus-logistics-backend.herokuapp.com/package?height=50&width=50&weight=2&length=50&state=SP',
+        `https://pegasus-logistics-backend.herokuapp.com/package?height=${height}&width=${width}&weight=${weight}&length=${length}&state=${uf}`,
         { headers }
       )
-      console.log(value)
+      await setFreteValue(value.data.price)
+      const responseCreateOrder = await createOrder({
+        variables: {
+          cepDestinatio: cep,
+          cpfRecipient: cpfDestinatario,
+          cpfSender: cpfRemetente,
+          finalValue: freteValue,
+          height: height,
+          length: length,
+          weight: weight,
+          width: width
+        }
+      })
+
+      setModalTitle('Sucesso! Veja abaixo o código do seu pedido.')
+      setModalDesc(
+        `Preço Final: R$${value.data.price.toFixed(2)} - Destino: ${cep}`
+      )
+      setModalCode(
+        responseCreateOrder.data.insert_pegasus_order.returning[0].orderCode
+      )
+      setModalSucess(true)
+      setOpen(true)
     } catch (error) {
-      alert('Não foi possivel completar a ação!')
-      console.log(error)
+      setModalTitle('Não foi possivel realizar a ação.')
+      setModalCode('Por favor contate nosso suporte!')
+      setModalSucess(false)
+      setOpen(true)
     }
   }
 
   return (
     <Container>
-      <FormContainer>
-        <Title>PACOTE</Title>
-        <Input
-          placeholder="Largura"
-          onChange={(e) => setWidth(e.target.value)}
-        />
-        <Input
-          placeholder="Altura"
-          onChange={(e) => setHeight(e.target.value)}
-        />
-        <Input
-          placeholder="Comprimento"
-          onChange={(e) => setLength(e.target.value)}
-        />
-        <Input placeholder="Peso" onChange={(e) => setWeight(e.target.value)} />
-      </FormContainer>
-      <FormContainer>
-        <Title>PEDIDO</Title>
-        <Input
-          placeholder="CPF Destinatario"
-          onChange={(e) => setCpfDestinatario(e.target.value)}
-        />
-        <Input
-          placeholder="CPF Remetente"
-          onChange={(e) => setCpfRemetente(e.target.value)}
-        />
-        <Input
-          placeholder="CEP Destino"
-          onChange={(e) => setCep(e.target.value)}
-        />
-        <BtnCadastrar onClick={() => handleClick()}>FAZER PEDIDO</BtnCadastrar>
-      </FormContainer>
+      <Form>
+        <FormContainer>
+          <Title>PACOTE</Title>
+          <Input
+            placeholder="Largura"
+            onChange={(e) => setWidth(e.target.value)}
+            required
+          />
+          <Input
+            placeholder="Altura"
+            onChange={(e) => setHeight(e.target.value)}
+            required
+          />
+          <Input
+            placeholder="Comprimento"
+            onChange={(e) => setLength(e.target.value)}
+            required
+          />
+          <Input
+            placeholder="Peso"
+            onChange={(e) => setWeight(e.target.value)}
+            required
+          />
+        </FormContainer>
+        <FormContainer>
+          <Title>PEDIDO</Title>
+          <Input
+            placeholder="CPF Destinatario"
+            onChange={(e) => setCpfDestinatario(e.target.value)}
+            required
+          />
+          <Input
+            placeholder="CPF Remetente"
+            onChange={(e) => setCpfRemetente(e.target.value)}
+            required
+          />
+          <Input
+            placeholder="CEP Destino"
+            onChange={(e) => setCep(e.target.value)}
+            required
+          />
+          <BtnCadastrar onClick={(e) => handleClick(e)}>
+            FAZER PEDIDO
+          </BtnCadastrar>
+        </FormContainer>
+      </Form>
+      <ModalComponent
+        open={open}
+        setOpen={setOpen}
+        TitleTxt={modalTitle}
+        DescTxt={modalDesc}
+        Sucess={modalSucess}
+        Code={modalCode}
+      />
     </Container>
   )
 }

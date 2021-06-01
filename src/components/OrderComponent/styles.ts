@@ -45,3 +45,9 @@ export const BtnCadastrar = styled.button`
   color: white;
   font-weight: bold;
 `
+export const Form = styled.form`
+  display: flex;
+  max-width: 800px;
+  width: 100%;
+  flex-flow: wrap;
+`
