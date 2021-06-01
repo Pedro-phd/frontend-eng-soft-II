@@ -14,10 +14,10 @@ import ModalComponent from '../Modal/index'
 
 function OrderComponent() {
   const [open, setOpen] = useState(false)
-  const [width, setWidth] = useState(0)
-  const [height, setHeight] = useState(0)
-  const [length, setLength] = useState(0)
-  const [weight, setWeight] = useState(0)
+  const [width, setWidth] = useState<any>(0)
+  const [height, setHeight] = useState<any>(0)
+  const [length, setLength] = useState<any>(0)
+  const [weight, setWeight] = useState<any>(0)
   const [cpfDestinatario, setCpfDestinatario] = useState('')
   const [cpfRemetente, setCpfRemetente] = useState('')
   const [cep, setCep] = useState('')
