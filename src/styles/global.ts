@@ -60,6 +60,9 @@ const GlobalStyles = createGlobalStyle`
         url('../fonts/poppins-v15-latin-800.svg#Poppins') format('svg'); /* Legacy iOS */
   }
   body {
+    overflow-y: hidden;
+    background: rgb(52,49,94);
+    background: linear-gradient(300deg, rgba(52,49,94,1) 0%, rgba(47,46,65,1) 100%);
     font-family: "Poppins", -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif
   }
 `

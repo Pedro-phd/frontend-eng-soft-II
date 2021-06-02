@@ -1,6 +1,5 @@
 import axios from 'axios'
 import { ReactNode, useState } from 'react'
-import { useLazyQuery, useMutation } from '@apollo/client'
 import {
   Container,
   Input,
@@ -10,18 +9,15 @@ import {
   Form,
   LoadingScreen
 } from './styles'
-import { GET_ORDER, CAD_ORDER } from '../../graphql/queries'
 import ModalComponent from '../Modal/index'
 import { BoxLoading } from 'react-loadingg'
 
-function OrderComponent() {
+function Frete() {
   const [open, setOpen] = useState(false)
   const [width, setWidth] = useState<any>(0)
   const [height, setHeight] = useState<any>(0)
   const [length, setLength] = useState<any>(0)
   const [weight, setWeight] = useState<any>(0)
-  const [cpfDestinatario, setCpfDestinatario] = useState('')
-  const [cpfRemetente, setCpfRemetente] = useState('')
   const [cep, setCep] = useState('')
   const [freteValue, setFreteValue] = useState(0)
 
@@ -31,8 +27,6 @@ function OrderComponent() {
   const [modalDesc, setModalDesc] = useState('Por favor contate nosso suporte!')
   const [modalCode, setModalCode] = useState('')
   const [modalSucess, setModalSucess] = useState(true)
-
-  const [createOrder, responseCreateOrderTest] = useMutation(CAD_ORDER)
 
   const headers = {
     'Content-Type': 'application/json; charset=utf-8',
@@ -53,27 +47,11 @@ function OrderComponent() {
         { headers }
       )
       await setFreteValue(value.data.price)
-      console.log(responseCreateOrderTest)
-      const responseCreateOrder = await createOrder({
-        variables: {
-          cepDestinatio: cep,
-          cpfRecipient: cpfDestinatario,
-          cpfSender: cpfRemetente,
-          finalValue: freteValue,
-          height: height,
-          length: length,
-          weight: weight,
-          width: width
-        }
-      })
-      setModalTitle('Sucesso! Veja abaixo o código do seu pedido.')
+      setModalTitle('Sucesso! Veja abaixo o valor aproximado do frete!.')
       setModalDesc(
-        `Preço Final: R$${value.data.price.toFixed(2)} - Destino: ${cep}`
+        `Preço Final: R${value.data.price.toFixed(2)} - Destino: ${cep}`
       )
-      setModalCode(
-        responseCreateOrder.data.insert_pegasus_order.returning[0].orderCode
-      )
-      setModalSucess(true)
+      setModalSucess(false)
       setLoading(false)
       setOpen(true)
     } catch (error) {
@@ -119,23 +97,11 @@ function OrderComponent() {
         <FormContainer>
           <Title>PEDIDO</Title>
           <Input
-            placeholder="CPF Destinatario"
-            onChange={(e) => setCpfDestinatario(e.target.value)}
-            required
-          />
-          <Input
-            placeholder="CPF Remetente"
-            onChange={(e) => setCpfRemetente(e.target.value)}
-            required
-          />
-          <Input
             placeholder="CEP Destino"
             onChange={(e) => setCep(e.target.value)}
             required
           />
-          <BtnCadastrar onClick={(e) => handleClick(e)}>
-            FAZER PEDIDO
-          </BtnCadastrar>
+          <BtnCadastrar onClick={(e) => handleClick(e)}>CALCULAR</BtnCadastrar>
         </FormContainer>
       </Form>
       <ModalComponent
@@ -150,4 +116,4 @@ function OrderComponent() {
   )
 }
 
-export default OrderComponent
+export default Frete
