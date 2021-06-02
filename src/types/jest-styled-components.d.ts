@@ -28,3 +28,7 @@ declare global {
 }
 
 export declare const styleSheetSerializer: Exclude<Plugin, NewPlugin>
+declare module '*&ts-ignore' {
+  const value: string
+  export = value
+}

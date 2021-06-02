@@ -11,6 +11,7 @@ module.exports = withPWA({
     webpack5: true
   }
 })
+
 module.exports = {
   webpack(config) {
     config.module.rules.push({

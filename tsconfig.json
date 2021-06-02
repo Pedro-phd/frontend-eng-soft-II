@@ -17,5 +17,7 @@
     "noImplicitAny":false
   },
   "exclude": ["node_modules"],
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx"]
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", "src/components/HomeComponent/index.jsx", "src/components/TopBar/index.jsx"],
+  "files": ["custom.d.ts"],
+
 }
